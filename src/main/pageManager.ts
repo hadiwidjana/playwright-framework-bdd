@@ -1,40 +1,49 @@
-import { Browser, BrowserContext, Locator, Page, chromium, expect } from "@playwright/test";
+import { Browser, BrowserContext, Locator, Page, chromium, expect, test } from "@playwright/test";
+import { testFixture } from "./testFixture";
 
 
 export class pageManager {
 
-    browser!: Browser;
-    context!: BrowserContext;
-    page!: Page;
-    page2!: Page;
-
-    constructor(){
-        
-    }
 
     async initBrowser() {
-        this.browser = await chromium.launch({
+        testFixture.browser = await chromium.launch({
             headless: false,
             args: [
                 "--start-maximized",
                 "--disable-blink-features=AutomationControlled"
             ]
         });
-        this.context = await this.browser.newContext();
-        this.page = await this.context.newPage();
+    }
+
+    async initPage() {
+        testFixture.context = await testFixture.browser.newContext({
+            viewport: null,
+            recordVideo: {
+                dir: './test-results/videos/'
+              }});
+        testFixture.page = await testFixture.context.newPage();
     }
 
     async openNewTab() {
-        this.page2 = await this.context.newPage()
+        testFixture.page2 = await testFixture.context.newPage()
     }
 
-    async closeTab(tabNumber: number) {
-        switch (tabNumber) {
+    async closePage(pageNumber: number) {
+        switch (pageNumber) {
             case 1:
-                await this.page.close();
+                await testFixture.page.close();
                 break;
             case 2:
-                await this.page2.close();
+                await testFixture.page2.close();
+                break;
+        }
+        await testFixture.context.close();
+    }
+
+    async closeBrowser(browserNumber: number) {
+        switch (browserNumber) {
+            case 1:
+                await testFixture.browser.close();
                 break;
         }
     }

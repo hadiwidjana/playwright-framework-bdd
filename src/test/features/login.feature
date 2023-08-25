@@ -16,7 +16,7 @@ Feature: User authentication test
 
         Examples:
             | email | password |
-            | satria.hadiwidjana@gmail.com | @Gecko1234 |
+            | satria.hadiwidjana@gmail.com | @Gecko123 |
 
     Scenario: Login fail using invalid email
         When User enter the username as "<email>"

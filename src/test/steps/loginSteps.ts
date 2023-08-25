@@ -1,9 +1,8 @@
-import { Page, test, Browser, BrowserContext, chromium } from '@playwright/test';
 import { homepage } from '../page/homepage';
 import { gmail } from '../page/gmail';
-import { Given, When, Then, setWorldConstructor, After, setDefaultTimeout } from '@cucumber/cucumber'
+import { Given, When, Then, setWorldConstructor, setDefaultTimeout } from '@cucumber/cucumber'
 import { CucumberAllureWorld } from "allure-cucumberjs";
-import { pageManager } from '../../main/pageManager';
+import { testFixture } from '../../main/testFixture';
 
 
 setDefaultTimeout(60 * 1000);
@@ -17,12 +16,9 @@ type CustomWorld = {
 
 let home: homepage
 let email: gmail;
-let pm: pageManager;
 
 Given('User navigates to homepage', async function (this: CustomWorld) {
-  pm = new pageManager();
-  await pm.initBrowser();
-  home = new homepage(this, pm.page);
+  home = new homepage(this, testFixture.page);
   await home.goToTokped();
 });
 
@@ -46,11 +42,11 @@ When('User select email verification option', async function () {
 })
 
 When('User open new tab', async function () {
-  await pm.openNewTab();
+  testFixture.page2 = await testFixture.context.newPage()
 });
 
 When('User login to gmail using {string} and {string}', async function (emailAdress, password) {
-  email = new gmail(this, pm.page2);
+  email = new gmail(this, testFixture.page2);
   await email.goToGmail();
   await email.inputEmail(emailAdress);
   await email.inputPassword(password);
@@ -59,6 +55,7 @@ When('User login to gmail using {string} and {string}', async function (emailAdr
 When('User open email to get the OTP', async function () {
   await email.getVerificationCode();
   await email.deleteAllMail();
+  await testFixture.page2.close();
 });
 
 
@@ -73,8 +70,4 @@ Then('login should be success', async function () {
 
 Then('login should fail', async function () {
   await home.emailNotFound();
-});
-
-After(async () => {
-  await pm.browser.close();
 });

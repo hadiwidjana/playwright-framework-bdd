@@ -7,14 +7,10 @@ export class basetest {
     screenshot: number = 0;
     page: Page;
 
-
-
     constructor(world: World, page: Page) {
         this.world = world;
         this.page = page;
     }
-
-
 
     async click(locator: Locator) {
         await this.sleep(500)
@@ -64,7 +60,5 @@ export class basetest {
     async sleep(miliseconds: number){
         await this.page.waitForTimeout(miliseconds);
     }
-
-
 
 }
